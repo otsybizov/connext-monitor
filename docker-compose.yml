@@ -1,0 +1,39 @@
+version: "3.8"
+
+services:
+  db:
+    image: postgres:latest
+    restart: on-failure
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - '5432:5432'
+
+  connext-monitor:
+    image: olegts81/connext-monitor:0.1.0
+    volumes:
+      - ./data:/data:r
+    environment:
+      POLL_INTERVAL_MILLISECONDS: 10000
+      EXECUTION_TIMEOUT_MILLISECONDS: 3600000
+      RECONCILIATION_TIMEOUT_MILLISECONDS: 3600000
+      BLOCK_SCAN_BATCH_SIZE: 50
+      DB_HOST: db
+      DB_PORT: 5432
+      DB_USER: postgres
+      DB_PASS: postgres
+      DB_NAME: connext
+      EMAIL_HOST:
+      EMAIL_PORT:
+      EMAIL_SECURE:
+      EMAIL_USER:
+      EMAIL_PASS:
+      EMAIL_SENDER:
+      EMAIL_RECIPIENT:
+    restart: on-failure
